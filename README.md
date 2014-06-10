@@ -20,7 +20,7 @@ Lo primero que tenemos que hacer es instalar nuestro arquetipo en nuestra máquin
 
 
 ```sh 
-git clone [git-repo-url] RestGenerator
+git clone https://github.com/xabe/RestGenerator.git
 cd rest-archetype-webapp
 mvn package install
 ```
