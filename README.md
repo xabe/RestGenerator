@@ -91,7 +91,7 @@ http://localhost:9080/test/profesor/all
 
 Con esto tenemos un proyecto base para hacer Servicios web
 
-Si te interesa saber mas de java y programación no dudes en seguir mi blog:
+Si te interesa saber más de java y programación no dudes en seguir mi blog:
 
 * [Mi blog]
 
