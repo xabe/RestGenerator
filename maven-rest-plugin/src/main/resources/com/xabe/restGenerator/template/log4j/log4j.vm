@@ -1,0 +1,20 @@
+log4j.rootCategory=INFO, file, stdout
+
+
+log4j.appender.stdout= org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout= org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern= %d{hh\:mm\:ss a } %p - %m%n
+
+log4j.logger.asdd.ee=INFO
+log4j.logger.asdd.ee.persistence=DEBUG
+log4j.logger.org.glassfish.jersey=INFO
+log4j.logger.org.mybatis.spring=INFO
+log4j.logger.org.apache.ibatis=INFO
+log4j.logger.org.springframework=INFO
+
+log4j.appender.file= org.apache.log4j.RollingFileAppender
+log4j.appender.file.File= ${catalina.base}/logs/${proyecto}.log
+log4j.appender.file.maxFileSize= 5000kb
+log4j.appender.file.maxBackupIndex= 10
+log4j.appender.file.layout= org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%d{MM/dd/yy hh\:mm\:ss a } %-5p %C %M - %m%n

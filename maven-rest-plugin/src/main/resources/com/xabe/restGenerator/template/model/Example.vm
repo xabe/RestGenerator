@@ -1,0 +1,12 @@
+public static class Criteria extends GeneratedCriteria implements CriteriaBase{
+
+#foreach( $keyvalue in $keyvalues )
+	 #if (! ${keyvalue.getType().contains("String")})
+	#set( $v =$keyvalue.getKey())
+	#set( $v=  $v.substring(0, 1).toUpperCase()+$v.substring(1,$v.length()))
+	public Criteria and${v}Like(String value) {
+            addCriterion("${keyvalue.getColumnName()} like", value, "${keyvalue.getKey()}");
+            return this;
+        }
+    #end
+#end

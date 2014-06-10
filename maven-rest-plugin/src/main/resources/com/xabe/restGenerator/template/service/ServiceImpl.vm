@@ -1,0 +1,110 @@
+package ${service}.${subpaquete};
+
+#set ($name_id="Id")
+#foreach( $keyvalue in $keyvalues )		
+	#if ($keyvalue.getKey().equalsIgnoreCase($table_key_normalizado))
+		#set ($name_id=$keyvalue.getName())
+	#end
+#end
+
+#set ($type_id="Integer")
+#foreach( $keyvalue in $keyvalues )		
+	#if ($keyvalue.getKey().equalsIgnoreCase($table_key_normalizado))
+			#set ($type_id=$keyvalue.getType())
+	#end
+#end
+
+#if ($type_id=="BigDecimal")
+import java.math.BigDecimal;
+#end
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import ${model}.${subpaquete}.${clase};
+import ${persistence}.${subpaquete}.${clase}Mapper;
+import ${persistence}.PaginationContext;
+import ${model}.${subpaquete}.${clase}Example;
+#if(${primaryKeyComposite})
+import ${model}.${subpaquete}.${clase}Key;
+#end
+
+ 
+@Service("${instancia}Service")
+@Transactional(readOnly = true, isolation=Isolation.READ_COMMITTED)
+public class ${clase}ServiceImpl implements ${clase}Service {
+	@Autowired
+	private ${clase}Mapper ${instancia}Mapper;
+	
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void add(${clase} a${clase}) {
+		${instancia}Mapper.insert(a${clase});
+	}
+	
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void update(${clase} a${clase}) {
+		#if(!${view} && ${hasPrimaryKey})
+			${instancia}Mapper.updateByPrimaryKey(a${clase});
+		#end
+	}
+	
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void update(${clase} a${clase}, ${clase}Example a${clase}Example) {
+		#if(!${view})
+			${instancia}Mapper.updateByExample(a${clase}, a${clase}Example);
+		#end
+	}
+
+	#if(!${primaryKeyComposite})
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void delete(${clase} a${clase}) {
+		#if(!${view} && ${hasPrimaryKey})
+			${clase}Example a${clase}Example = new ${clase}Example();
+			a${clase}Example.createCriteria().and${name_id}EqualTo(a${clase}.get${name_id}());
+			${instancia}Mapper.deleteByExample(a${clase}Example);
+		#end
+	}
+	#else
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void delete(${clase} a${clase}) {
+		${instancia}Mapper.deleteByPrimaryKey(a${clase});
+	}
+	public ${clase} findById(${clase}Key a${clase}Key) {
+		return ${instancia}Mapper.selectByPrimaryKey(a${clase}Key);
+	}	
+	#end
+	
+	
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED)
+	public void delete(${clase}Example a${clase}Example) {
+		#if(!${view})
+			${instancia}Mapper.deleteByExample(a${clase}Example);
+		#end
+	}
+
+	public List<${clase}> getAll() {		
+		return ${instancia}Mapper.selectByExample(new ${clase}Example());
+	}
+
+	public List<${clase}> getAll(${clase}Example a${clase}Example) {		
+		return ${instancia}Mapper.selectByExample(a${clase}Example);
+	}
+	
+	public List<${clase}> getPaginated(${clase}Example example,PaginationContext paginationContext) {
+		int page = paginationContext.getCurrentPage();
+		if(page < 1)
+		{
+			page = 1;
+		}
+		paginationContext.setSkipResults(paginationContext.getMaxResults() * (page - 1));
+		paginationContext.updateTotalCount(${instancia}Mapper.countByExample(example));
+		example.setLimit(paginationContext.getSkipResults() + paginationContext.getMaxResults());
+		example.setOffset(paginationContext.getSkipResults());
+		return  ${instancia}Mapper.selectByExamplePagination(example);
+	}
+}
+	

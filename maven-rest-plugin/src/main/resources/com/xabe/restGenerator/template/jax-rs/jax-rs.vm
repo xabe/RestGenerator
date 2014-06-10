@@ -1,0 +1,208 @@
+package ${root}.ws.${subpaquete};
+
+#set ($name_id="Id")
+#foreach( $keyvalue in $keyvalues )		
+	#if ($keyvalue.getKey().equalsIgnoreCase($table_key_normalizado))
+		#set ($name_id=$keyvalue.getName())
+	#end
+#end
+
+#set ($type_id="Integer")
+#foreach( $keyvalue in $keyvalues )		
+	#if ($keyvalue.getKey().equalsIgnoreCase($table_key_normalizado))
+			#set ($type_id=$keyvalue.getType())
+	#end
+#end
+
+import java.net.URI;
+import java.net.URISyntaxException;
+#if ($type_id=="BigDecimal")
+import java.math.BigDecimal;
+#end
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+#if(!${view} && ${hasPrimaryKey})	
+import javax.ws.rs.PathParam;
+#end
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import ${model}.${subpaquete}.${clase};
+import ${model}.${subpaquete}.${clase}Example;
+#if(${primaryKeyComposite})
+import ${model}.${subpaquete}.${clase}Key;
+#end
+import ${persistence}.PaginationContext;
+import ${service}.${subpaquete}.${clase}Service;
+import  ${root}.ws.BaseRest;
+
+@Path("/${instancia}")
+@Component
+@Scope(value="request")
+public class ${clase}Rest extends BaseRest {	
+	
+	@Autowired
+	private ${clase}Service service;	
+	
+	
+	#if(${primaryKeyComposite})
+	
+		#set ($location="%s")
+		#set ($entityKeys="")
+		#set ($path="")
+		#set ($pathParam="")
+		#set ($last = false)
+		#foreach( $primaryKey in $primarysKeys )
+			#if($velocityCount == $primarysKeys.size())
+				#set ($last = true)
+			#end
+			#set ( $location = $location + "/%s")
+			#foreach( $keyvalue in $keyvalues )
+				 #if (${keyvalue.getKey().equalsIgnoreCase($primaryKey)})
+					#set( $path = $path + '/{' + $keyvalue.getKey() + '}')
+					#if(!$last)
+						#set( $pathParam = $pathParam + '@PathParam("' + $keyvalue.getKey() + '") ' + $keyvalue.getType() + ' '  + $keyvalue.getKey() + " , " )
+			    		#set( $entityKeys = $entityKeys + 'entity.get' + $keyvalue.getName() + '()' + " , " )
+			    	#else
+			    		#set( $pathParam = $pathParam + '@PathParam("' + $keyvalue.getKey() + '") ' + $keyvalue.getType() + ' '  + $keyvalue.getKey() )
+			    		#set( $entityKeys = $entityKeys + 'entity.get' + $keyvalue.getName() + '()' )
+			    	#end
+			    	#break
+			    #end
+		    #end
+		#end
+		
+		@GET
+		@Path("${path}")
+		@Produces(MediaType.APPLICATION_JSON)
+		public ${clase} getPrimearyKey(${pathParam}) {
+			${clase}Key a${clase}Key = new ${clase}Key();
+			#foreach( $primaryKey in $primarysKeys )
+				#foreach( $keyvalue in $keyvalues )
+					 #if (${keyvalue.getKey().equalsIgnoreCase($primaryKey)})
+						a${clase}Key.set$keyvalue.getName()($keyvalue.getKey());
+				    	#break
+				    #end
+			    #end
+			#end
+			return service.findById(a${clase}Key);
+		}
+	
+	#else
+		#if(!${view} && ${hasPrimaryKey})	
+			@GET
+			@Path("/{${name_id}}")
+			@Produces(MediaType.APPLICATION_JSON)
+			public List<${clase}> get${name_id}(@DefaultValue("1") @PathParam("${name_id}") ${type_id} ${name_id}) {
+				${clase}Example example = new ${clase}Example();
+				example.createCriteria().and${name_id}EqualTo(${name_id});
+				return service.getAll(example);
+			}
+		#end
+	#end
+	
+	@GET
+	@Path("/pagination")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<${clase}> getCursosPagination(
+				@DefaultValue("0") @QueryParam("frist") Integer first,
+				@DefaultValue("10") @QueryParam("pageSize") Integer pageSize,
+				@DefaultValue("id") @QueryParam("sortField") String sortField,
+				@DefaultValue("ASC") @QueryParam("sortOrder") String sortOrder) {
+
+		${clase}Example example = new ${clase}Example();
+		if (sortField != null) {
+			example.setOrderByClause(sortField + " " + sortOrder);
+		}
+		PaginationContext paginationContext = new PaginationContext();
+		paginationContext.setSkipResults(first);
+		paginationContext.setMaxResults(pageSize);
+		return service.getPaginated(example, paginationContext);
+	}
+	
+	@GET
+	@Path("/all")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<${clase}> getAll(
+				@DefaultValue("id") @QueryParam("sortField") String sortField,
+				@DefaultValue("ASC") @QueryParam("sortOrder") String sortOrder) {
+
+		${clase}Example example = new ${clase}Example();
+		if (sortField != null) {
+			example.setOrderByClause(sortField + " " + sortOrder);
+		}
+		return service.getAll(example);
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response  post(${clase} entity) {
+		Response response = null;
+		try
+		{
+			service.add(entity);
+			#if(${primaryKeyComposite})
+				String location = String.format("${location}", uriInfo.getAbsolutePath().toString(), ${entityKeys});
+			#else
+				#if(!${view} && ${hasPrimaryKey})	
+					String location = String.format("%s/%s", uriInfo.getAbsolutePath().toString(), entity.get${name_id}());
+				#else
+					String location = String.format("%s/all", uriInfo.getAbsolutePath().toString());
+				#end
+			#end			
+			response = Response.created(new URI(location)).build();
+		}catch(URISyntaxException e){
+			logger.error("Error al añadir una prueba "+e.getMessage());
+			response = Response.status(500).entity(e.getMessage()).build();
+		}
+		return response;	
+	}
+	
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response  update(${clase} entity) {
+		Response response = null;
+		try
+		{
+			service.update(entity);
+			response = Response.status(200).entity("Modificado").build();
+		}catch(Exception e){
+			logger.error("Error al actulizar una prueba "+e.getMessage());
+			response = Response.status(500).entity(e.getMessage()).build();
+		}
+		return response;	
+	}
+	
+	@DELETE
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response  delete(${clase} entity) {
+		Response response = null;
+		try
+		{
+			service.delete(entity);
+			response = Response.status(200).entity("Borrado").build();
+		}catch(Exception e){
+			logger.error("Error al borrar una prueba "+e.getMessage());
+			response = Response.status(500).entity(e.getMessage()).build();
+		}
+		return response;	
+	}
+	
+	
+}

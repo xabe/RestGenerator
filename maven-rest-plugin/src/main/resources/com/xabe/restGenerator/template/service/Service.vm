@@ -1,0 +1,16 @@
+package ${service}.${subpaquete};
+
+import ${model}.${subpaquete}.${clase};
+import ${model}.${subpaquete}.${clase}Example;
+#if(${primaryKeyComposite})
+import ${model}.${subpaquete}.${clase}Key;
+#end
+import ${service}.ServiceBase;
+ 
+ public interface ${clase}Service extends ServiceBase<${clase}, ${clase}Example> {
+	
+	#if(${primaryKeyComposite})	 
+		${clase} findById (${clase}Key a${clase}Key);
+	#end
+
+}

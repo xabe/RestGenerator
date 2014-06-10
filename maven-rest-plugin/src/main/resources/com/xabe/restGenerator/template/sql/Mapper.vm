@@ -1,0 +1,92 @@
+	<!-- Custom operations -->
+    
+    <delete id="deleteAllData" parameterType="${paquete}.model.${subpaquete}.${clase}Example">
+        TRUNCATE TABLE ${tabla}
+  	</delete>
+  	
+	#if($type_data_base.equalsIgnoreCase("mysql"))
+  	<select resultMap="BaseResultMap" parameterType="${paquete}.model.${subpaquete}.${clase}Example" id="selectByExamplePagination" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ${tabla}
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+        limit ${limit}
+    </if>
+    <if test="offset != null" >
+        offset ${offset}
+    </if>
+    </select>
+    #end   
+   
+	#if($type_data_base.equalsIgnoreCase("oracle"))
+    <select resultMap="BaseResultMap" parameterType="${paquete}.model.${subpaquete}.${clase}Example" id="selectByExamplePagination" >
+    SELECT * FROM
+	(
+		SELECT a.*, rownum minimun
+		FROM
+		(
+		select
+    		<if test="distinct" >
+      			distinct
+    		</if>
+    		<include refid="Base_Column_List" />
+    		from ${tabla}
+    		<if test="_parameter != null" >
+      			<include refid="Example_Where_Clause" />
+   	 		</if>
+    		<if test="orderByClause != null" >
+      		order by ${orderByClause}
+    		</if>
+   		) a
+   		<if test="limit != null" >
+			WHERE rownum &lt;  ${limit}
+		</if>		
+	)
+	<if test="offset != null" >
+	WHERE minimun > ${offset}
+	</if>
+    </select> 
+    #end
+    
+    #if($type_data_base.equalsIgnoreCase("sqlServer"))
+    <select resultMap="BaseResultMap" parameterType="${paquete}.model.${subpaquete}.${clase}Example" id="selectByExamplePagination" >
+    select TOP ${limit} b.*
+    FROM
+	(
+		SELECT ROW_NUMBER() OVER 
+		(
+			<if test="orderByClause == null" >
+      			order by ${columnaOrder}
+    		</if>
+    		<if test="orderByClause != null" >
+      			order by ${orderByClause}
+    		</if>
+		) as row_number, *
+			FROM
+			(
+				select
+    				<if test="distinct" >
+      					distinct
+    				</if>
+    				<include refid="Base_Column_List" />
+    				from ${tabla}
+			) AS a
+			<if test="_parameter != null" >
+      			<include refid="Example_Where_Clause" />
+   	 		</if>
+	) AS b
+	<if test="offset != null" >
+		where b.row_number > ${offset}
+	</if>
+    </select> 
+    #end
+  

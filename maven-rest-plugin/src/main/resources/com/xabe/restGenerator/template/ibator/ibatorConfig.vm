@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+	
+	<context id="mysql" targetRuntime="MyBatis3" defaultModelType="conditional">
+  
+    <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" />
+    <plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
+  
+    <jdbcConnection driverClass="${driver}" connectionURL="${url}" userId="${user}" password="${password}" />
+
+    <javaTypeResolver >
+      <property name="forceBigDecimals" value="false" />
+    </javaTypeResolver>
+
+    <javaModelGenerator targetPackage="${model}"
+			targetProject="${source}">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+	</javaModelGenerator>
+
+    <sqlMapGenerator targetPackage="${sql}"
+			targetProject="${resource}">
+			<property name="enableSubPackages" value="true" />
+	</sqlMapGenerator>
+
+    <javaClientGenerator type="XMLMAPPER" targetPackage="${dao}"  targetProject="${source}">
+      <property name="enableSubPackages" value="true" />
+    </javaClientGenerator>
+
+	#foreach( $table in $tables )
+		<table tableName="$table.table" domainObjectName="$table.tableDomain">
+			#if($table.keyIbator != '')
+				<generatedKey column="$table.keyIbator" sqlStatement="$table.typeId" identity="$table.identity"/>
+			#end			
+		</table>
+	#end
+	
+  </context>
+</generatorConfiguration>

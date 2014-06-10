@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context reloadable="true">
+	<!-- Java DataSource -->
+    <Resource name="jdbc/${project}"
+		validationQuery="select 1 from dual" 
+		auth="Container"
+		driverClassName="${driver}"
+		factory="com.jolbox.bonecp.BoneCPDataSource"
+		type="javax.sql.DataSource"
+		username="${user}" 
+		password="${password}"
+		jdbcUrl="${url}" 
+		idleConnectionTestPeriodInMinutes="1"
+		idleMaxAgeInMinutes="240" 
+		maxConnectionsPerPartition="30" 
+		minConnectionsPerPartition="10"
+		partitionCount="3" 
+		acquireIncrement="5" 
+		statementsCacheSize="100" 
+		releaseHelperThreads="0" />
+		
+</Context>
