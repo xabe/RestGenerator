@@ -180,7 +180,7 @@ public class ${clase}Rest extends BaseRest {
 		try
 		{
 			service.update(entity);
-			response = Response.status(200).entity("Modificado").build();
+			response = Response.accepted().build();
 		}catch(Exception e){
 			logger.error("Error al actulizar una prueba "+e.getMessage());
 			response = Response.status(500).entity(e.getMessage()).build();
@@ -196,7 +196,7 @@ public class ${clase}Rest extends BaseRest {
 		try
 		{
 			service.delete(entity);
-			response = Response.status(200).entity("Borrado").build();
+			response = Response.accepted().build();
 		}catch(Exception e){
 			logger.error("Error al borrar una prueba "+e.getMessage());
 			response = Response.status(500).entity(e.getMessage()).build();
