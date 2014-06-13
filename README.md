@@ -21,6 +21,7 @@ Lo primero que tenemos que hacer es instalar nuestro arquetipo en nuestra máquin
 
 ```sh 
 git clone https://github.com/xabe/RestGenerator.git
+cd RestGenerator
 cd rest-archetype-webapp
 mvn package install
 ```
@@ -29,6 +30,7 @@ mvn package install
 Con esto ya tenemos el arquetipo instalado en nuestra máquina, hacemos lo mismo con el plugin
 
 ```sh 
+cd ..
 cd maven-rest-puglin
 mvn package install
 ```
