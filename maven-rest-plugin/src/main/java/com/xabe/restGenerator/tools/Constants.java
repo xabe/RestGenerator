@@ -62,8 +62,10 @@ public class Constants {
 	public final static String MODEL_ENTITY_OLD = "public class {0} implements Serializable";
 	public final static String MODEL_ENTITY_NEW = "import {1}.EntityBase;\n" +
 												  "import javax.xml.bind.annotation.XmlRootElement;\n" +
+												  "import com.fasterxml.jackson.annotation.JsonIgnoreProperties;\n" +
 												  "\n"+
 												  "@XmlRootElement\n"+
+												  "@JsonIgnoreProperties(ignoreUnknown=true)\n"+
 												  "public class {0} extends EntityBase implements Serializable";
 	
 	public final static String MODEL_ENTITY_NEW_COMPOSITE = "import {1}.EntityBase;\n" +

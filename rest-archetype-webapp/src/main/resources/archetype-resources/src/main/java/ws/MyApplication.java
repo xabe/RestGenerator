@@ -21,6 +21,7 @@ public class MyApplication extends ResourceConfig {
     public MyApplication () {
     	packages("${package}.ws");
         register(RequestContextFilter.class);
+		register(CORSFilter.class);
         register(JacksonFeature.class);
         //property(ServerProperties.MEDIA_TYPE_MAPPINGS, "txt : text/plain, xml : application/xml, json : application/json");
         if (mediaTypeMap == null)

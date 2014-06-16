@@ -193,6 +193,79 @@ public class ${clase}Rest extends BaseRest {
 		return response;	
 	}
 	
+	#if(${primaryKeyComposite})
+	
+		#set ($location="%s")
+		#set ($entityKeys="")
+		#set ($path="")
+		#set ($pathParam="")
+		#set ($last = false)
+		#foreach( $primaryKey in $primarysKeys )
+			#if($velocityCount == $primarysKeys.size())
+				#set ($last = true)
+			#end
+			#set ( $location = $location + "/%s")
+			#foreach( $keyvalue in $keyvalues )
+				 #if (${keyvalue.getKey().equalsIgnoreCase($primaryKey)})
+					#set( $path = $path + '/{' + $keyvalue.getKey() + '}')
+					#if(!$last)
+						#set( $pathParam = $pathParam + '@PathParam("' + $keyvalue.getKey() + '") ' + $keyvalue.getType() + ' '  + $keyvalue.getKey() + " , " )
+			    		#set( $entityKeys = $entityKeys + 'entity.get' + $keyvalue.getName() + '()' + " , " )
+			    	#else
+			    		#set( $pathParam = $pathParam + '@PathParam("' + $keyvalue.getKey() + '") ' + $keyvalue.getType() + ' '  + $keyvalue.getKey() )
+			    		#set( $entityKeys = $entityKeys + 'entity.get' + $keyvalue.getName() + '()' )
+			    	#end
+			    	#break
+			    #end
+		    #end
+		#end
+		
+		@PUT
+		@Path("${path}")
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response updateId(${clase} entity) {
+			Response response = null;
+			try 
+			{		
+				service.update(entity );
+				Message message = new Message();
+				message.setMessage("Modificado");
+				response = Response.accepted().entity(message).build();
+			} catch (Exception e) {
+				logger.error("Error al borrar una prueba " + e.getMessage());
+				response = Response.status(500).entity(e.getMessage()).build();
+			}
+			return response;
+		}
+	
+	#else
+	
+		#if(!${view} && ${hasPrimaryKey})	
+			
+			@PUT
+			@Path("/{${name_id}}")
+			@Consumes(MediaType.APPLICATION_JSON)
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response deleteId(${clase} entity) {
+				Response response = null;
+				try 
+				{				
+					service.delete(entity);
+					Message message = new Message();
+					message.setMessage("Modificado");
+					response = Response.accepted().entity(message).build();
+				} catch (Exception e) {
+					logger.error("Error al borrar una prueba " + e.getMessage());
+					response = Response.status(500).entity(e.getMessage()).build();
+				}
+				return response;
+			}
+		#end
+	#end
+	
+
+	
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -210,6 +283,129 @@ public class ${clase}Rest extends BaseRest {
 		}
 		return response;	
 	}
+	
+	
+	
+	#if(${primaryKeyComposite})
+	
+		#set ($location="%s")
+		#set ($entityKeys="")
+		#set ($path="")
+		#set ($pathParam="")
+		#set ($last = false)
+		#foreach( $primaryKey in $primarysKeys )
+			#if($velocityCount == $primarysKeys.size())
+				#set ($last = true)
+			#end
+			#set ( $location = $location + "/%s")
+			#foreach( $keyvalue in $keyvalues )
+				 #if (${keyvalue.getKey().equalsIgnoreCase($primaryKey)})
+					#set( $path = $path + '/{' + $keyvalue.getKey() + '}')
+					#if(!$last)
+						#set( $pathParam = $pathParam + '@PathParam("' + $keyvalue.getKey() + '") ' + $keyvalue.getType() + ' '  + $keyvalue.getKey() + " , " )
+			    		#set( $entityKeys = $entityKeys + 'entity.get' + $keyvalue.getName() + '()' + " , " )
+			    	#else
+			    		#set( $pathParam = $pathParam + '@PathParam("' + $keyvalue.getKey() + '") ' + $keyvalue.getType() + ' '  + $keyvalue.getKey() )
+			    		#set( $entityKeys = $entityKeys + 'entity.get' + $keyvalue.getName() + '()' )
+			    	#end
+			    	#break
+			    #end
+		    #end
+		#end
+		
+		@DELETE
+		@Path("${path}")
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response deleteId(${pathParam}) {
+			Response response = null;
+			try 
+			{
+				${clase}Key a${clase}Key = new ${clase}Key();
+				#foreach( $primaryKey in $primarysKeys )
+					#foreach( $keyvalue in $keyvalues )
+						 #if (${keyvalue.getKey().equalsIgnoreCase($primaryKey)})
+							a${clase}Key.set$keyvalue.getName()($keyvalue.getKey());
+					    	#break
+					    #end
+				    #end
+				#end				
+				service.delete(a${clase}Key );
+				Message message = new Message();
+				message.setMessage("Borrado");
+				response = Response.accepted().entity(message).build();
+			} catch (Exception e) {
+				logger.error("Error al borrar una prueba " + e.getMessage());
+				response = Response.status(500).entity(e.getMessage()).build();
+			}
+			return response;
+		}
+	
+	#else
+	
+		#if(!${view} && ${hasPrimaryKey})	
+			
+			@DELETE
+			@Path("/{${name_id}}")
+			@Consumes(MediaType.APPLICATION_JSON)
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response deleteId(@DefaultValue("1") @PathParam("${name_id}") ${type_id} ${name_id}) {
+				Response response = null;
+				try 
+				{				
+					${clase} entity = new ${clase}();
+					#if(!${view} && ${hasPrimaryKey})	
+						entity.set${name_id}(${name_id});
+					#end
+					service.delete(entity);
+					Message message = new Message();
+					message.setMessage("Borrado");
+					response = Response.accepted().entity(message).build();
+				} catch (Exception e) {
+					logger.error("Error al borrar una prueba " + e.getMessage());
+					response = Response.status(500).entity(e.getMessage()).build();
+				}
+				return response;
+			}
+		#end
+	#end
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
 	
 	
 }
