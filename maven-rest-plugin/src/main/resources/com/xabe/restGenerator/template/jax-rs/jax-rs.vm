@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import ${model}.Message;
 import ${model}.${subpaquete}.${clase};
 import ${model}.${subpaquete}.${clase}Example;
 #if(${primaryKeyComposite})
@@ -159,12 +160,14 @@ public class ${clase}Rest extends BaseRest {
 				String location = String.format("${location}", uriInfo.getAbsolutePath().toString(), ${entityKeys});
 			#else
 				#if(!${view} && ${hasPrimaryKey})	
-					String location = String.format("%s/%s", uriInfo.getAbsolutePath().toString(), entity.get${name_id}());
+					String location = String.format("%s%s", uriInfo.getAbsolutePath().toString(), entity.get${name_id}());
 				#else
-					String location = String.format("%s/all", uriInfo.getAbsolutePath().toString());
+					String location = String.format("%sall", uriInfo.getAbsolutePath().toString());
 				#end
-			#end			
-			response = Response.created(new URI(location)).build();
+			#end	
+			Message message = new Message();
+			message.setMessage("Creado");		
+			response = Response.created(new URI(location)).entity(message).build();
 		}catch(URISyntaxException e){
 			logger.error("Error al añadir una prueba "+e.getMessage());
 			response = Response.status(500).entity(e.getMessage()).build();
@@ -180,7 +183,9 @@ public class ${clase}Rest extends BaseRest {
 		try
 		{
 			service.update(entity);
-			response = Response.accepted().build();
+			Message message = new Message();
+			message.setMessage("Modificado");
+			response = Response.accepted().entity(message).build();
 		}catch(Exception e){
 			logger.error("Error al actulizar una prueba "+e.getMessage());
 			response = Response.status(500).entity(e.getMessage()).build();
@@ -196,7 +201,9 @@ public class ${clase}Rest extends BaseRest {
 		try
 		{
 			service.delete(entity);
-			response = Response.accepted().build();
+			Message message = new Message();
+			message.setMessage("Borrado");
+			response = Response.accepted().entity(message).build();
 		}catch(Exception e){
 			logger.error("Error al borrar una prueba "+e.getMessage());
 			response = Response.status(500).entity(e.getMessage()).build();
